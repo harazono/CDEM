@@ -12,8 +12,8 @@ if __name__ == '__main__':
 	parser.add_argument("sorted_bam",       help = "Aligned reads to be counted. BAM should be sorted by position")
 	parser.add_argument("-k", "--kmer",  help = "k-mer size. Default is 0", default = 0, type = int)
 	parser.add_argument("-c", "--chr",   help = "chromosome or contig to be considered", default = "")
-	parser.add_argument("-s", "--start", help = "start position of the region", default = 100,  type = int)
-	parser.add_argument("-e", "--end",   help = "end   position of the region", default = 101, type = int)
+	parser.add_argument("-s", "--start", help = "start position of the region", type = int)
+	parser.add_argument("-e", "--end",   help = "end   position of the region", type = int)
 	parser.add_argument("--json",        help = "If this arg is set then output results in JSON format.", action = 'store_true')
 
 	args = parser.parse_args()
@@ -39,10 +39,13 @@ if __name__ == '__main__':
 
 		if not refcon in context_readbase_dict.keys():
 			context_readbase_dict[refcon] = dict(A = 0, C = 0, G = 0, T = 0)
+
 		for pileupread in pileupcolumn.pileups:
 			if not pileupread.is_del and not pileupread.is_refskip:
 				base = pileupread.alignment.query_sequence[pileupread.query_position]
-				context_readbase_dict[refcon][base] += 1
+				if base == "A" or base == "C" or base == "G" or "T":
+					context_readbase_dict[refcon][base] += 1
+
 	if is_json:
 		pp.pprint(json.dumps(context_readbase_dict))
 	else:
