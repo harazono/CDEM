@@ -20,7 +20,7 @@ if __name__ == '__main__':
 
 	ref_file_path = args.reference_genome
 	bam_file_path = args.sorted_bam
-	k             = args.k
+	k             = args.kmer
 	chrm          = args.chr
 	start_pos     = args.start
 	end_pos       = args.end
