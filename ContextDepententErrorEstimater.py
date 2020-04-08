@@ -22,7 +22,7 @@ if __name__ == '__main__':
 	bam_file_path = args.sorted_bam
 	k             = args.kmer
 	chrm          = args.chr
-	start_pos     = args.start
+	start_pos     = args.start + k
 	end_pos       = args.end
 	is_json       = args.json
 	ref           = pysam.FastaFile(ref_file_path)
@@ -38,13 +38,15 @@ if __name__ == '__main__':
 		refcon  = ref.fetch(reference = reference, start = pileupcolumn.pos - k, end = pileupcolumn.pos + 1 + k)
 
 		if not refcon in context_readbase_dict.keys():
-			context_readbase_dict[refcon] = dict(A = 0, C = 0, G = 0, T = 0)
+			context_readbase_dict[refcon] = dict(A = 0, C = 0, G = 0, T = 0, x = 0)# use x as gap
 
 		for pileupread in pileupcolumn.pileups:
-			if not pileupread.is_del and not pileupread.is_refskip:
+			if not pileupread.is_refskip and not pileupread.is_del:
 				base = pileupread.alignment.query_sequence[pileupread.query_position]
-				if base == "A" or base == "C" or base == "G" or "T":
+				if base == "A" or base == "C" or base == "G" or base == "T":
 					context_readbase_dict[refcon][base] += 1
+			if pileupread.is_del:
+				context_readbase_dict[refcon]["x"] += 1
 
 	if is_json:
 		pp.pprint(json.dumps(context_readbase_dict))
