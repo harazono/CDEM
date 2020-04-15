@@ -10,12 +10,13 @@ if __name__ == '__main__':
 	parser = argparse.ArgumentParser(description = 'count occurences of each pair of context((2*k+1)-mer) and single base(1-mer)')
 	parser.add_argument("reference_genome", help = "The reference genome. The format should be FASTA")
 	parser.add_argument("sorted_bam",       help = "Aligned reads to be counted. BAM should be sorted by position")
-	parser.add_argument("-k", "--kmer",  help = "k-mer size. Default is 0", default = 0, type = int)
-	parser.add_argument("-c", "--chr",   help = "chromosome or contig to be considered", default = "")
-	parser.add_argument("-s", "--start", help = "start position of the region", default = 0, type = int)
-	parser.add_argument("-e", "--end",   help = "end   position of the region", type = int)
-	parser.add_argument("--json",        help = "If this arg is set then output results in JSON format.", action = 'store_true')
-	parser.add_argument("-v", "--verbose", help = "Outputs verbose", action = 'store_true')
+	parser.add_argument("-k", "--kmer",     help = "k-mer size. Default is 0", default = 0, type = int)
+	parser.add_argument("-c", "--chr",      help = "chromosome or contig to be considered", default = "")
+	parser.add_argument("-s", "--start",    help = "start position of the region", default = 0, type = int)
+	parser.add_argument("-e", "--end",      help = "end   position of the region", type = int)
+	parser.add_argument("--json",           help = "If this arg is set then output results in JSON format.", action = 'store_true')
+	parser.add_argument("-v", "--verbose",  help = "Outputs verbose", action = 'store_true')
+	parser.add_argument("--large",          help = "count (2k+1)x(2k+1)", action = 'store_true')
 	args = parser.parse_args()
 
 	ref_file_path = args.reference_genome
@@ -30,6 +31,7 @@ if __name__ == '__main__':
 	reference     = ref.references[0]
 	context_readbase_dict = {}
 	is_verbose    = args.verbose
+	is_large      = args.large
 
 	reference_size = len(ref.fetch(reference = reference))
 	if chrm != "":
@@ -47,13 +49,26 @@ if __name__ == '__main__':
 		if pileupcolumn.pos - k <= 0 or pileupcolumn.pos + 1 + k >= reference_size:
 			continue
 
-		refbase = ref.fetch(reference = reference, start = pileupcolumn.pos, end = pileupcolumn.pos + 1)
-		refcon  = ref.fetch(reference = reference, start = pileupcolumn.pos - k, end = pileupcolumn.pos + 1 + k)
+		refbase = ref.fetch(reference = reference, start = pileupcolumn.pos,     end = pileupcolumn.pos + 1)
+		refcon  = ref.fetch(reference = reference, start = pileupcolumn.pos - k - 1, end = pileupcolumn.pos + k)
 
 		if not refcon in context_readbase_dict.keys():
-			context_readbase_dict[refcon] = dict(A = 0, C = 0, G = 0, T = 0, x = 0)# use x as gap
+			if not is_large:
+				context_readbase_dict[refcon] = dict(A = 0, C = 0, G = 0, T = 0, x = 0)# use x as gap
+			else:
+				context_readbase_dict[refcon] = {}
 
 		for pileupread in pileupcolumn.pileups:
+			if is_large:
+				if pileupread.query_position != None:
+					read_context = pileupread.alignment.seq[pileupread.query_position - k - 1 : pileupread.query_position + k]
+				else:
+					continue
+				if not read_context in context_readbase_dict[refcon].keys():
+					context_readbase_dict[refcon][read_context] = 1
+				else:
+					context_readbase_dict[refcon][read_context] += 1
+				continue
 			if not pileupread.is_refskip and not pileupread.is_del:
 				base = pileupread.alignment.query_sequence[pileupread.query_position]
 				if base == "A" or base == "C" or base == "G" or base == "T":
