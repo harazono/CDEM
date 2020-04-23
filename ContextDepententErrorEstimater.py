@@ -80,7 +80,7 @@ if __name__ == '__main__':
 			print("%s/%s proceeded\r"%(roop_counter, len_of_region), file = sys.stderr, end = "")
 
 	if is_json:
-		pp.pprint(json.dumps(context_readbase_dict))
+		print(json.dumps(context_readbase_dict))
 	else:
 		pp.pprint(context_readbase_dict)
 
