@@ -50,7 +50,7 @@ if __name__ == '__main__':
 			continue
 
 		refbase = ref.fetch(reference = reference, start = pileupcolumn.pos,     end = pileupcolumn.pos + 1)
-		refcon  = ref.fetch(reference = reference, start = pileupcolumn.pos - k - 1, end = pileupcolumn.pos + k)
+		refcon  = ref.fetch(reference = reference, start = pileupcolumn.pos - k, end = pileupcolumn.pos + k + 1)
 
 		if not refcon in context_readbase_dict.keys():
 			if not is_large:
@@ -61,7 +61,7 @@ if __name__ == '__main__':
 		for pileupread in pileupcolumn.pileups:
 			if is_large:
 				if pileupread.query_position != None:
-					read_context = pileupread.alignment.seq[pileupread.query_position - k - 1 : pileupread.query_position + k]
+					read_context = pileupread.alignment.seq[pileupread.query_position - k : pileupread.query_position + k + 1]
 				else:
 					continue
 				if not read_context in context_readbase_dict[refcon].keys():
