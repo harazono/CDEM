@@ -1,16 +1,16 @@
-DEPENDS  := .depend.mk
-#CXXFLAGS := -g -Wall -O0 -DNDEBUG -std=c++11 -fopenmp -lgomp -I /home/harazono/R10-3BaseCallEval/CDEM/htslib/
-CXXFLAGS := -g -Wall -O0 -std=c++11 -fopenmp -lgomp -include $(DEPENDS) -I /home/harazono/R10-3BaseCallEval/CDEM/htslib
-GTESTFLAGS := -lgtest -lpthread
-SOURCES := cdem.cpp
+CXXFLAGS := -Wall -O0  -I htslib
 CXX := $(HOME)/local/bin/g++
+CC := $(HOME)/local/bin/gcc
+.PHONY: depend clean test biuld_test
+SRCS := cdem.cpp
+$(foreach SRC,$(SRCS),$(eval $(subst \,,$(shell $(CXX) -MM $(SRC)))))
 
-.PHONY: depend clean test build_test
 
 all: CDEM
 
-CDEM: cdem.o
-	$(CXX) $(CXXFLAGS) -o $@ $^
+CDEM: cdem.cpp htslib/hts.o htslib/sam.o htslib/hfile.o
+	$(CXX) $(CXXFLAGS) -o $@
+
 
 clean:
 	-rm *.o

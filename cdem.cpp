@@ -64,6 +64,7 @@ int main(int argc, char *argv[]){
   if(optind + NUM_REQUIRED_ARGUMENTS != argc) {
     printUsageAndExit();
   }*/
+  fprintf(stderr, "Hello, world\n");
   const int    optind = 0;
   const char* reference_genome_filename = argv[optind + 0];
   const char* aligned_reads_filename    = argv[optind + 1];
