@@ -11,7 +11,8 @@
 #include <stdexcept>
 #include "cpas_debug.h"
 #include "cpas_tsv.h"
-
+#include "htslib/htslib/sam.h"
+#include "htslib/htslib/hts.h"
 
 using namespace std;
 
@@ -63,7 +64,18 @@ int main(int argc, char *argv[]){
   if(optind + NUM_REQUIRED_ARGUMENTS != argc) {
     printUsageAndExit();
   }*/
-
+  const int    optind = 0;
+  const char* reference_genome_filename = argv[optind + 0];
+  const char* aligned_reads_filename    = argv[optind + 1];
+  htsFile *in_sam;
+  in_sam = sam_open(aligned_reads_filename, "r");
+  if(in_sam == NULL){
+    fprintf(stderr, "failed to open %s\n", aligned_reads_filename);
+    return 2;
+  }
+  sam_close(in_sam);
+  string name_of_the_only_reference_sequence;
   return 0;
+
 }
 
