@@ -1,13 +1,13 @@
 CXXFLAGS := -Wall -O0  -I htslib
 CXX := $(HOME)/local/bin/g++
 CC := $(HOME)/local/bin/gcc
-#LDFLAGS := htslib
+LDFLAGS := htslib/libhts.so
 .PHONY: depend clean test biuld_test
 SRCS := cdem.cpp
 
 all: CDEM
-CDEM: cdem.cpp htslib/hts.o htslib/sam.o htslib/hfile.o
-	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $^ $@
+CDEM: cdem.cpp
+	$(CXX) $(CXXFLAGS) $(LDFLAGS) -o $@ $^
 
 
 clean:

@@ -18,7 +18,7 @@ using namespace std;
 
 
 void printUsageAndExit(){
-  fprintf(stderr, "cdem <reference.fa> <aligned_reads.sort.bam>");
+  fprintf(stderr, "cdem <reference.fa> <aligned_reads.sort.bam>\n");
   exit(2);
 }
 
@@ -64,19 +64,24 @@ int main(int argc, char *argv[]){
   if(optind + NUM_REQUIRED_ARGUMENTS != argc) {
     printUsageAndExit();
   }*/
-  fprintf(stderr, "Hello, world\n");
+  if(argc < 3){
+    printUsageAndExit();
+  }
   const int    optind = 0;
-  const char* reference_genome_filename = argv[optind + 0];
-  const char* aligned_reads_filename    = argv[optind + 1];
-  htsFile *in_sam;
+  const char* reference_genome_filename = argv[1];
+  const char* aligned_reads_filename    = argv[2];
+  fprintf(stderr, "reference_genome_filename \t= %s\n", reference_genome_filename);
+  fprintf(stderr, "aligned_reads_filename    \t= %s\n", aligned_reads_filename);
+  htsFile *in_sam = NULL;
   in_sam = sam_open(aligned_reads_filename, "r");
   if(in_sam == NULL){
     fprintf(stderr, "failed to open %s\n", aligned_reads_filename);
     return 2;
+  }else{
+    fprintf(stderr, "get sam\n");
+    sam_close(in_sam);
   }
-  sam_close(in_sam);
   string name_of_the_only_reference_sequence;
   return 0;
-
 }
 
